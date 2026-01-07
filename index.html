@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow Pro | Task Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --warning-color: #ffcc00;
+            --danger-color: #f44336;
+            --info-color: #17a2b8;
+            --gray-light: #e9ecef;
+            --gray-medium: #adb5bd;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 i {
+            color: var(--accent-color);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-role {
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin: 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .role-badge {
+            background-color: var(--accent-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .header-left h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--gray-medium);
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            color: var(--gray-medium);
+            font-weight: 500;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .card-count {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .card-change {
+            font-size: 0.9rem;
+        }
+
+        .card-change.positive {
+            color: var(--success-color);
+        }
+
+        .card-change.negative {
+            color: var(--danger-color);
+        }
+
+        /* Table Styles */
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid var(--gray-light);
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: rgba(255, 204, 0, 0.2);
+            color: #b38f00;
+        }
+
+        .status-in-progress {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: #1a8ca6;
+        }
+
+        .status-done {
+            background-color: rgba(75, 181, 67, 0.2);
+            color: #2e7d32;
+        }
+
+        .user-active {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .user-inactive {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        .action-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-color);
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--gray-light);
+            color: var(--dark-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-medium);
+        }
+
+        /* File Upload */
+        .file-upload-container {
+            border: 2px dashed var(--gray-light);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-container:hover {
+            border-color: var(--primary-color);
+        }
+
+        .file-upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .file-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background-color: var(--gray-light);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--gray-light);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Login/Logout Time */
+        .time-tracker {
+            background-color: rgba(67, 97, 238, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .time-tracker p {
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Notification Panel */
+        .notification-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: right 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .notification-panel.active {
+            right: 0;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .notification-item {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--gray-light);
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification-item.unread {
+            border-left-color: var(--danger-color);
+            background-color: rgba(244, 67, 54, 0.05);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: var(--dark-color);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-left h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Hide elements based on role */
+        .admin-only {
+            display: none;
+        }
+
+        body.admin .admin-only {
+            display: block;
+        }
+
+        body.admin .manager-only,
+        body.admin .employee-only {
+            display: none;
+        }
+
+        body.manager .manager-only {
+            display: block;
+        }
+
+        body.manager .admin-only,
+        body.manager .employee-only {
+            display: none;
+        }
+
+        body.employee .employee-only {
+            display: block;
+        }
+
+        body.employee .admin-only,
+        body.employee .manager-only {
+            display: none;
+        }
+    </style>
+</head>
+<body class="admin">
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2><i class="fas fa-tasks"></i> TaskFlow Pro</h2>
+        </div>
+        
+        <div class="user-role">
+            <span>Logged in as:</span>
+            <span class="role-badge" id="role-display">Admin</span>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active" data-tab="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li class="admin-only"><a href="#" data-tab="users"><i class="fas fa-users"></i> Users</a></li>
+            <li class="admin-only"><a href="#" data-tab="roles"><i class="fas fa-user-tag"></i> Roles</a></li>
+            <li><a href="#" data-tab="projects"><i class="fas fa-project-diagram"></i> Projects</a></li>
+            <li><a href="#" data-tab="tasks"><i class="fas fa-tasks"></i> Tasks</a></li>
+            <li><a href="#" data-tab="assign-task"><i class="fas fa-user-check"></i> Assign Task</a></li>
+            <li><a href="#" data-tab="file-upload"><i class="fas fa-file-upload"></i> File Upload</a></li>
+            <li><a href="#" data-tab="reports"><i class="fas fa-chart-bar"></i> Reports</a></li>
+            <li><a href="#" data-tab="settings"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <div class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <h1 id="page-title">Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="time-tracker-card">
+                    <div><small>Login: <span id="login-time">09:00 AM</span></small></div>
+                    <div><small>Logout: <span id="logout-time">06:00 PM</span></small></div>
+                </div>
+                <div class="notification-icon" id="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count">3</span>
+                </div>
+                <div class="user-profile" id="user-profile">
+                    <div class="profile-img">AJ</div>
+                    <div>
+                        <div class="user-name">Admin John</div>
+                        <div class="user-email">admin@taskflow.com</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <section class="tab-content active" id="dashboard">
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Total Users</div>
+                        <div class="card-icon" style="background-color: var(--primary-color);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="card-count">42</div>
+                    <div class="card-change positive"><i class="fas fa-arrow-up"></i> 12% from last month</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Active Projects</div>
+                        <div class="card-icon" style="background-color: var(--success-color);">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                    </div>
+                    <div class="card-count">18</div>
+                    <div class="card-change positive"><i class="fas fa-arrow-up"></i> 5% from last week</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Pending Tasks</div>
+                        <div class="card-icon" style="background-color: var(--warning-color);">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                    </div>
+                    <div class="card-count">127</div>
+                    <div class="card-change negative"><i class="fas fa-arrow-down"></i> 8% from yesterday</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Completed Tasks</div>
+                        <div class="card-icon" style="background-color: var(--info-color);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="card-count">892</div>
+                    <div class="card-change positive"><i class="fas fa-arrow-up"></i> 15% from last week</div>
+                </div>
+            </div>
+            
+            <!-- Tables -->
+            <div class="table-container">
+                <div class="table-title">Recent Tasks</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Task Name</th>
+                            <th>Project</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#T-101</td>
+                            <td>Design Homepage</td>
+                            <td>Website Redesign</td>
+                            <td>Sarah Johnson</td>
+                            <td>2023-10-15</td>
+                            <td><span class="status-badge status-in-progress">In Progress</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#T-102</td>
+                            <td>API Integration</td>
+                            <td>Mobile App</td>
+                            <td>Mike Chen</td>
+                            <td>2023-10-10</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#T-103</td>
+                            <td>Database Optimization</td>
+                            <td>Backend System</td>
+                            <td>Alex Rodriguez</td>
+                            <td>2023-10-05</td>
+                            <td><span class="status-badge status-done">Done</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="table-container admin-only">
+                <div class="table-title">Active / Inactive Users</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#U-101</td>
+                            <td>Admin John</td>
+                            <td>admin@taskflow.com</td>
+                            <td>Admin</td>
+                            <td><span class="user-active">Active</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-user-slash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#U-102</td>
+                            <td>Manager Sarah</td>
+                            <td>sarah@taskflow.com</td>
+                            <td>Manager</td>
+                            <td><span class="user-active">Active</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-user-slash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#U-103</td>
+                            <td>Employee Mike</td>
+                            <td>mike@taskflow.com</td>
+                            <td>Employee</td>
+                            <td><span class="user-inactive">Inactive</span></td>
+                            <td>
+                                <button class="action-btn"><i class="fas fa-user-check"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Users Tab Content -->
+        <section class="tab-content" id="users">
+            <div class="form-container">
+                <h2 class="table-title">Add New User</h2>
+                <form id="add-user-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-name">Full Name</label>
+                            <input type="text" id="user-name" placeholder="Enter full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-email">Email Address</label>
+                            <input type="email" id="user-email" placeholder="Enter email address" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-role">Role</label>
+                            <select id="user-role" required>
+                                <option value="">Select Role</option>
+                                <option value="admin">Admin</option>
+                                <option value="manager">Manager</option>
+                                <option value="employee">Employee</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-status">Status</label>
+                            <select id="user-status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </form>
+            </div>
+        </section>
+        
+        <!-- Projects Tab Content -->
+        <section class="tab-content" id="projects">
+            <div class="form-container">
+                <h2 class="table-title">Add New Project</h2>
+                <form id="add-project-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="project-name">Project Name</label>
+                            <input type="text" id="project-name" placeholder="Enter project name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="project-manager">Project Manager</label>
+                            <select id="project-manager" required>
+                                <option value="">Select Manager</option>
+                                <option value="Sarah Johnson">Sarah Johnson</option>
+                                <option value="Mike Chen">Mike Chen</option>
+                                <option value="Alex Rodriguez">Alex Rodriguez</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="project-description">Project Description</label>
+                        <textarea id="project-description" rows="4" placeholder="Enter project description"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="project-start">Start Date</label>
+                            <input type="date" id="project-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="project-end">End Date</label>
+                            <input type="date" id="project-end" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Create Project</button>
+                </form>
+            </div>
+        </section>
+        
+        <!-- Tasks Tab Content -->
+        <section class="tab-content" id="tasks">
+            <div class="tabs">
+                <div class="tab active" data-task-tab="pending">Pending</div>
+                <div class="tab" data-task-tab="in-progress">In Progress</div>
+                <div class="tab" data-task-tab="done">Done</div>
+            </div>
+            
+            <div class="tab-content active" id="pending-tasks">
+                <div class="table-container">
+                    <div class="table-title">Pending Tasks</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Project</th>
+                                <th>Assigned To</th>
+                                <th>Due Date</th>
+                                <th>Priority</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#T-104</td>
+                                <td>Bug Fixes</td>
+                                <td>Website Redesign</td>
+                                <td>Emily Davis</td>
+                                <td>2023-10-12</td>
+                                <td>High</td>
+                                <td>
+                                    <button class="action-btn"><i class="fas fa-play"></i></button>
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="in-progress-tasks">
+                <div class="table-container">
+                    <div class="table-title">In Progress Tasks</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Project</th>
+                                <th>Assigned To</th>
+                                <th>Due Date</th>
+                                <th>Progress</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#T-101</td>
+                                <td>Design Homepage</td>
+                                <td>Website Redesign</td>
+                                <td>Sarah Johnson</td>
+                                <td>2023-10-15</td>
+                                <td>65%</td>
+                                <td>
+                                    <button class="action-btn"><i class="fas fa-check"></i></button>
+                                    <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="done-tasks">
+                <div class="table-container">
+                    <div class="table-title">Completed Tasks</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Project</th>
+                                <th>Assigned To</th>
+                                <th>Completed Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#T-103</td>
+                                <td>Database Optimization</td>
+                                <td>Backend System</td>
+                                <td>Alex Rodriguez</td>
+                                <td>2023-10-05</td>
+                                <td><span class="status-badge status-done">Done</span></td>
+                                <td>
+                                    <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                    <button class="action-btn"><i class="fas fa-redo"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <!-- File Upload Tab Content -->
+        <section class="tab-content" id="file-upload">
+            <div class="form-container">
+                <h2 class="table-title">Upload Files</h2>
+                <p>Supported formats: Word (.doc, .docx), Excel (.xls, .xlsx), PDF, Images (.jpg, .png, .gif)</p>
+                
+                <div class="file-upload-container" id="file-drop-area">
+                    <div class="file-upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>Drag & Drop Files Here</h3>
+                    <p>or click to browse files</p>
+                    <input type="file" id="file-input" multiple style="display: none;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="file-description">File Description (Optional)</label>
+                    <textarea id="file-description" rows="3" placeholder="Enter file description"></textarea>
+                </div>
+                
+                <button class="btn btn-primary" id="upload-button">Upload Files</button>
+                
+                <h3 style="margin-top: 30px;">Uploaded Files</h3>
+                <ul class="file-list" id="file-list">
+                    <li class="file-item">
+                        <div class="file-info">
+                            <i class="fas fa-file-pdf file-icon"></i>
+                            <div>
+                                <div class="file-name">Project_Report.pdf</div>
+                                <div class="file-size">2.4 MB</div>
+                            </div>
+                        </div>
+                        <button class="action-btn"><i class="fas fa-download"></i></button>
+                    </li>
+                    <li class="file-item">
+                        <div class="file-info">
+                            <i class="fas fa-file-image file-icon"></i>
+                            <div>
+                                <div class="file-name">Dashboard_Design.png</div>
+                                <div class="file-size">1.1 MB</div>
+                            </div>
+                        </div>
+                        <button class="action-btn"><i class="fas fa-download"></i></button>
+                    </li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Assign Task Tab Content -->
+        <section class="tab-content" id="assign-task">
+            <div class="form-container">
+                <h2 class="table-title">Assign New Task</h2>
+                <form id="assign-task-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-title">Task Title</label>
+                            <input type="text" id="task-title" placeholder="Enter task title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-project">Project</label>
+                            <select id="task-project" required>
+                                <option value="">Select Project</option>
+                                <option value="Website Redesign">Website Redesign</option>
+                                <option value="Mobile App">Mobile App</option>
+                                <option value="Backend System">Backend System</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-assignee">Assign To</label>
+                            <select id="task-assignee" required>
+                                <option value="">Select Employee</option>
+                                <option value="Sarah Johnson">Sarah Johnson</option>
+                                <option value="Mike Chen">Mike Chen</option>
+                                <option value="Alex Rodriguez">Alex Rodriguez</option>
+                                <option value="Emily Davis">Emily Davis</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-priority">Priority</label>
+                            <select id="task-priority" required>
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-description">Task Description</label>
+                        <textarea id="task-description" rows="4" placeholder="Enter task description" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-start">Start Date</label>
+                            <input type="date" id="task-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-due">Due Date</label>
+                            <input type="date" id="task-due" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Assign Task</button>
+                </form>
+            </div>
+        </section>
+        
+        <!-- Other tabs would go here -->
+    </main>
+    
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notification-panel">
+        <div class="notification-header">
+            <h3>Notifications</h3>
+            <button class="action-btn" id="close-notifications"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="notification-item unread">
+            <h4>New Task Assigned</h4>
+            <p>You have been assigned a new task: "Design Homepage"</p>
+            <small>10 minutes ago</small>
+        </div>
+        
+        <div class="notification-item unread">
+            <h4>Project Deadline Approaching</h4>
+            <p>"Website Redesign" project deadline is in 3 days</p>
+            <small>2 hours ago</small>
+        </div>
+        
+        <div class="notification-item">
+            <h4>File Uploaded</h4>
+            <p>Sarah Johnson uploaded "Project_Report.pdf"</p>
+            <small>Yesterday</small>
+        </div>
+        
+        <div class="notification-item">
+            <h4>New User Added</h4>
+            <p>New employee "Emily Davis" has been added to the system</p>
+            <small>2 days ago</small>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const sidebar = document.querySelector('.sidebar');
+        const menuToggle = document.getElementById('menu-toggle');
+        const overlay = document.getElementById('overlay');
+        const notificationIcon = document.getElementById('notification-icon');
+        const notificationPanel = document.getElementById('notification-panel');
+        const closeNotifications = document.getElementById('close-notifications');
+        const fileDropArea = document.getElementById('file-drop-area');
+        const fileInput = document.getElementById('file-input');
+        const tabLinks = document.querySelectorAll('.sidebar-menu a');
+        const pageTitle = document.getElementById('page-title');
+        const roleDisplay = document.getElementById('role-display');
+        const userProfile = document.getElementById('user-profile');
+        const taskTabs = document.querySelectorAll('[data-task-tab]');
+        
+        // Current user role (can be changed to 'manager' or 'employee')
+        let currentRole = 'admin';
+        
+        // Set current date for date inputs
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('project-start').value = today;
+        document.getElementById('task-start').value = today;
+        
+        // Set future dates for end dates
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 30);
+        const futureDateStr = futureDate.toISOString().split('T')[0];
+        document.getElementById('project-end').value = futureDateStr;
+        document.getElementById('task-due').value = futureDateStr;
+        
+        // Login/logout time
+        const loginTime = new Date();
+        loginTime.setHours(9, 0, 0);
+        document.getElementById('login-time').textContent = formatTime(loginTime);
+        
+        const logoutTime = new Date();
+        logoutTime.setHours(18, 0, 0);
+        document.getElementById('logout-time').textContent = formatTime(logoutTime);
+        
+        // Format time to AM/PM
+        function formatTime(date) {
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return hours + ':' + minutes + ' ' + ampm;
+        }
+        
+        // Toggle sidebar on mobile
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking overlay
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            notificationPanel.classList.remove('active');
+        });
+        
+        // Toggle notification panel
+        notificationIcon.addEventListener('click', () => {
+            notificationPanel.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+        
+        // Close notification panel
+        closeNotifications.addEventListener('click', () => {
+            notificationPanel.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+        
+        // File upload functionality
+        fileDropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropArea.style.borderColor = 'var(--primary-color)';
+            fileDropArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+        });
+        
+        fileDropArea.addEventListener('dragleave', () => {
+            fileDropArea.style.borderColor = 'var(--gray-light)';
+            fileDropArea.style.backgroundColor = 'transparent';
+        });
+        
+        fileDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropArea.style.borderColor = 'var(--gray-light)';
+            fileDropArea.style.backgroundColor = 'transparent';
+            
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+        
+        fileInput.addEventListener('change', () => {
+            const files = fileInput.files;
+            handleFiles(files);
+        });
+        
+        function handleFiles(files) {
+            if (files.length > 0) {
+                alert(`${files.length} file(s) selected for upload. In a real application, these would be uploaded to a server.`);
+                // Reset file input
+                fileInput.value = '';
+            }
+        }
+        
+        // Tab switching functionality
+        tabLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from all tabs
+                tabLinks.forEach(item => item.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                link.classList.add('active');
+                
+                // Get tab id
+                const tabId = link.getAttribute('data-tab');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show selected tab content
+                document.getElementById(tabId).classList.add('active');
+                
+                // Update page title
+                pageTitle.textContent = link.textContent.trim();
+                
+                // Close sidebar on mobile
+                if (window.innerWidth <= 992) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+        
+        // Task tab switching
+        taskTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all task tabs
+                taskTabs.forEach(item => item.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Get task tab id
+                const taskTabId = tab.getAttribute('data-task-tab');
+                
+                // Hide all task tab contents
+                document.querySelectorAll('#tasks .tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show selected task tab content
+                document.getElementById(`${taskTabId}-tasks`).classList.add('active');
+            });
+        });
+        
+        // Change role functionality (for demo purposes)
+        userProfile.addEventListener('click', () => {
+            const newRole = prompt('Change role for demo (admin, manager, employee):', currentRole);
+            if (newRole && ['admin', 'manager', 'employee'].includes(newRole.toLowerCase())) {
+                currentRole = newRole.toLowerCase();
+                
+                // Update body class to show/hide role-specific elements
+                document.body.className = currentRole;
+                
+                // Update role display
+                const roleText = currentRole.charAt(0).toUpperCase() + currentRole.slice(1);
+                roleDisplay.textContent = roleText;
+                
+                // Update user name based on role
+                const userName = document.querySelector('.user-name');
+                const userEmail = document.querySelector('.user-email');
+                
+                if (currentRole === 'admin') {
+                    userName.textContent = 'Admin John';
+                    userEmail.textContent = 'admin@taskflow.com';
+                } else if (currentRole === 'manager') {
+                    userName.textContent = 'Manager Sarah';
+                    userEmail.textContent = 'sarah@taskflow.com';
+                } else {
+                    userName.textContent = 'Employee Mike';
+                    userEmail.textContent = 'mike@taskflow.com';
+                }
+                
+                // Update profile image initials
+                document.querySelector('.profile-img').textContent = 
+                    userName.textContent.split(' ').map(n => n[0]).join('');
+                
+                alert(`Role changed to ${roleText}. Page will show ${roleText}-specific content.`);
+            }
+        });
+        
+        // Form submission handling
+        document.getElementById('add-user-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('User added successfully! In a real application, this would send data to a server.');
+            this.reset();
+        });
+        
+        document.getElementById('add-project-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Project created successfully! In a real application, this would send data to a server.');
+            this.reset();
+            document.getElementById('project-start').value = today;
+            document.getElementById('project-end').value = futureDateStr;
+        });
+        
+        document.getElementById('assign-task-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Task assigned successfully! In a real application, this would send data to a server.');
+            this.reset();
+            document.getElementById('task-start').value = today;
+            document.getElementById('task-due').value = futureDateStr;
+        });
+        
+        // Initialize with today's date
+        document.getElementById('project-start').value = today;
+        document.getElementById('task-start').value = today;
+    </script>
+</body>
+</html>
